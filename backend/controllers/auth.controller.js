@@ -1,5 +1,6 @@
 import User from "../models/user.model.js";
 import bcryptjs from "bcryptjs";
+
 import { generateTokenAndSetCookie } from "../utilis/generateTokenAndSetCookie.js";
 
 export const register = async (req, res) => {
@@ -79,35 +80,37 @@ export const login = async (req, res) => {
             return res.status(400).json({success:false, message: "Invalid password" });
         }
         //generate token and set cookie
-        generateTokenAndSetCookie(user._id, res);
+        generateTokenAndSetCookie(res, user._id );
         //send user details
         return res.status(200).json({
             success: true,
             message: "User logged in successfully",
+            
             user: {
                 ...user._doc,
                 password: undefined
+               
             }
+            
         });
 
     } catch (error) {
         console.log("error in login user controller", error);
-        return res.status(500).json({ success: false, message: "Internal Server Error", });
+        return res.status(400).json({ success: false, message: error.message, });
 
     }
 
 }
 //logout user
 export const logout = async (req, res) => {
-    try {
-        res.clearCookie("token", "", {maxAge: 0, });
-        return res.status(200).json({
-            success: true,
-            message: "User logged out successfully",
-        });
+    
+        try {
+            res.cookie("token", "", { maxAge: 0 });
+            res.status(200).json({ message: "Logged out successfully" });
+        } 
         
         
-    } catch (error) {
+     catch (error) {
         console.log("error in logout user controller", error);
         return res.status(500).json({ success: false, message: "Internal Server Error", });
         
@@ -118,23 +121,17 @@ export const logout = async (req, res) => {
 //check if user is authenticated
 export const getUser = async (req, res) => {
     try {
-        const user = await User.findById(req.userId).select("-password");
+        const user = await User.findById(req.userId);
         if (!user) {
             return res.status(400).json({ success: false, message: "User not found" });
         }
-        return res.status(200).json({
-            success: true,
-            message: "User found",
-            user: {
-                ...user._doc,
-                password: undefined
-                }
-                });
-
+        res.status(200).json(
+            user
+        )
         
     } catch (error) {
         console.log("error in get user controller", error);
-        return res.status(500).json({ success: false, message: "Internal Server Error", });
+        return res.status(500).json({ success: false, message: error.message, });
         
     }
 }

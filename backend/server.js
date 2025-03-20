@@ -8,6 +8,7 @@ import postRoutes from "./routes/post.route.js";
 import notificationRoutes from "./models/notification.model.js";
 import connectDB from "./db/connectDB.js";
 import cookieParser from "cookie-parser";
+import cors from "cors";
 import { v2 as cloudinary } from "cloudinary";
 
 cloudinary.config({
@@ -20,12 +21,13 @@ cloudinary.config({
 
 
 const PORT = process.env.PORT;
-
+app.use(cors({origin:"http://localhost:5173", credentials:true}))
 
 //middelware
+app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(cookieParser());
+
 //routes
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
