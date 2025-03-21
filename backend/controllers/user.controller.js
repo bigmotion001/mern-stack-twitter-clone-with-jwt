@@ -86,7 +86,7 @@ export const followAndUnfollowUser = async (req, res) => {
 
 
     } catch (error) {
-        return res.status(500).json({ success: false, message: "Internal server error", error });
+        return res.status(500).json({ success: false, message: error.message });
         console.log(error.message);
 
     }

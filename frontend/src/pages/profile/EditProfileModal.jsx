@@ -1,8 +1,12 @@
 import { useState } from "react";
+import toast from "react-hot-toast";
+import { useMutation,useQueryClient } from "@tanstack/react-query";
+import API_URL from "../../config/data";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
 
 const EditProfileModal = () => {
 	const [formData, setFormData] = useState({
-		fullName: "",
+		name: "",
 		username: "",
 		email: "",
 		bio: "",
@@ -14,6 +18,50 @@ const EditProfileModal = () => {
 	const handleInputChange = (e) => {
 		setFormData({ ...formData, [e.target.name]: e.target.value });
 	};
+
+
+	const queryClient = useQueryClient();
+
+
+//update profilr data
+const {mutate:updateData, isPending} = useMutation({
+	mutationFn: async ({name, username, email, bio, link, newPassword, currentPassword})=>{
+		try {
+			const res= await fetch(`${API_URL}/api/users/update`, {
+				method: "POST",
+				credentials: 'include',
+				headers:{
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({name, username, email, bio, link, newPassword, currentPassword}),
+			});
+			const data = await res.json();
+			if(!res.ok){
+				
+				throw new Error(data.message)
+				
+			}
+			
+			return data;
+		} catch (error) {
+			throw new Error(error);
+		};
+	},
+
+	onSuccess: () => {
+		// refetch the authUser
+		toast.success("profile updated Successful")
+		
+		queryClient.invalidateQueries({ queryKey: ["authUser"] });
+	},
+	
+})
+
+const handleupdateData =(e)=>{
+	e.preventDefault();
+	updateData(formData);
+
+}
 
 	return (
 		<>
@@ -28,18 +76,15 @@ const EditProfileModal = () => {
 					<h3 className='font-bold text-lg my-3'>Update Profile</h3>
 					<form
 						className='flex flex-col gap-4'
-						onSubmit={(e) => {
-							e.preventDefault();
-							alert("Profile updated successfully");
-						}}
+						onSubmit={handleupdateData}
 					>
 						<div className='flex flex-wrap gap-2'>
 							<input
 								type='text'
 								placeholder='Full Name'
 								className='flex-1 input border border-gray-700 rounded p-2 input-md'
-								value={formData.fullName}
-								name='fullName'
+								value={formData.name}
+								name='name'
 								onChange={handleInputChange}
 							/>
 							<input
@@ -94,7 +139,11 @@ const EditProfileModal = () => {
 							name='link'
 							onChange={handleInputChange}
 						/>
-						<button className='btn btn-primary rounded-full btn-sm text-white'>Update</button>
+						<button className='btn btn-primary rounded-full btn-sm text-white
+						'disabled={isPending}
+						>
+							{isPending? <LoadingSpinner/>: "Update"}
+							</button>
 					</form>
 				</div>
 				<form method='dialog' className='modal-backdrop'>

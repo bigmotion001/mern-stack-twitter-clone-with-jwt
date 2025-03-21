@@ -11,10 +11,15 @@ import { FaArrowLeft } from "react-icons/fa6";
 import { IoCalendarOutline } from "react-icons/io5";
 import { FaLink } from "react-icons/fa";
 import { MdEdit } from "react-icons/md";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery,useMutation,useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
+import API_URL from "../../config/data";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
+
 
 const ProfilePage = () => {
 
+	const queryClient = useQueryClient();
  const {data:authUser}=useQuery({queryKey: ["authUser"]})
 
 	const [coverImg, setCoverImg] = useState(null);
@@ -24,20 +29,10 @@ const ProfilePage = () => {
 	const coverImgRef = useRef(null);
 	const profileImgRef = useRef(null);
 
-	const isLoading = false;
+	
 	const isMyProfile = true;
 
-	const user = {
-		_id: "1",
-		fullName: "John Doe",
-		username: "johndoe",
-		profileImg: "/avatars/boy2.png",
-		coverImg: "/cover.png",
-		bio: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-		link: "https://youtube.com/@asaprogrammer_",
-		following: ["1", "2", "3"],
-		followers: ["1", "2", "3"],
-	};
+	const isLoading = false;
 
 	const handleImgChange = (e, state) => {
 		const file = e.target.files[0];
@@ -51,14 +46,52 @@ const ProfilePage = () => {
 		}
 	};
 
+
+	const {mutate:updateProfile, isPending} = useMutation({
+		mutationFn: async ({profileImg, coverImg})=>{
+			try {
+				const res= await fetch(`${API_URL}/api/users/update`, {
+					method: "POST",
+					credentials: 'include',
+					headers:{
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify({ profileImg, coverImg }),
+				});
+				const data = await res.json();
+				if(!res.ok){
+					
+					throw new Error(data.message)
+					
+				}
+				
+				return data;
+			} catch (error) {
+				throw new Error(error);
+			};
+		},
+
+		onSuccess: () => {
+			// refetch the authUser
+			toast.success("profile updated Successful")
+			
+			queryClient.invalidateQueries({ queryKey: ["authUser"] });
+		},
+		
+	})
+
+
+
+	
+
 	return (
 		<>
 			<div className='flex-[4_4_0]  border-r border-gray-700 min-h-screen '>
 				{/* HEADER */}
 				{isLoading && <ProfileHeaderSkeleton />}
-				{!isLoading && !user && <p className='text-center text-lg mt-4'>User not found</p>}
+				{!isLoading && !authUser && <p className='text-center text-lg mt-4'>User not found</p>}
 				<div className='flex flex-col'>
-					{!isLoading && user && (
+					{!isLoading && authUser && (
 						<>
 							<div className='flex gap-10 px-4 py-2 items-center'>
 								<Link to='/'>
@@ -125,9 +158,12 @@ const ProfilePage = () => {
 								{(coverImg || profileImg) && (
 									<button
 										className='btn btn-primary rounded-full btn-sm text-white px-4 ml-2'
-										onClick={() => alert("Profile updated successfully")}
+										onClick={(e)=>{
+											e.preventDefault();
+											updateProfile({profileImg, coverImg})
+										}}
 									>
-										Update
+									{isPending? <LoadingSpinner/>: "Update"}	
 									</button>
 								)}
 							</div>
