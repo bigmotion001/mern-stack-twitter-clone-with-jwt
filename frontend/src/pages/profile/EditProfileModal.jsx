@@ -52,7 +52,8 @@ const {mutate:updateData, isPending} = useMutation({
 		// refetch the authUser
 		toast.success("profile updated Successful")
 		
-		queryClient.invalidateQueries({ queryKey: ["authUser"] });
+		
+		queryClient.invalidateQueries({ queryKey: ["userprofile"] });
 	},
 	
 })

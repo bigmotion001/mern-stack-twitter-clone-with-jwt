@@ -1,16 +1,19 @@
 import { Link } from "react-router-dom";
 import RightPanelSkeleton from "../skeletons/RightPanelSkeleton";
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {  useQuery } from "@tanstack/react-query";
 import API_URL from "../../config/data";
 import LoadingSpinner from "./LoadingSpinner";
-import toast from "react-hot-toast";
+import useFollow from "../../hooks/useFollow";
+
 
 const RightPanel = () => {
-	const queryClient = useQueryClient();
+	
+  const {followUser, isPending} = useFollow();
+  
   //who to follow
   const { data: suggestedUser, isLoading } = useQuery({
-    queryKey: ["suggestedUser"],
+    queryKey: ["suggestedUsers"],
     queryFn: async () => {
       try {
         const res = await fetch(`${API_URL}/api/users/suggested`, {
@@ -31,38 +34,7 @@ const RightPanel = () => {
     retry: false,
   });
 
-  //follow
-  const { mutate:followUser, isPending } = useMutation({
-    
-    mutationFn: async (id) => {
-      try {
-        const res = await fetch(`${API_URL}/api/users/follow/${id}`, {
-          method: "POST",
-          credentials: "include",
-        });
-        const data = await res.json();
-        if (!res.ok) {
-			
-          throw new Error(data.message);
-        }
-
-        return;
-		
-      } catch (error) {
-        throw new Error(error);
-      }
-    },
-	onSuccess: () => {
-		Promise.all([
-			queryClient.invalidateQueries({ queryKey: ["suggestedUsers"] }),
-			queryClient.invalidateQueries({ queryKey: ["authUser"] }),
-			toast.success("followed successful")
-		]);
-	},
-	onError: (error) => {
-		toast.error(error.message);
-	},
-  });
+  
 
  
 
@@ -111,7 +83,7 @@ const RightPanel = () => {
 					}}
 					
                   >
-                  {isPending? (<LoadingSpinner/>):("Follow") }  
+                  {isPending? (<LoadingSpinner/>): ("Follow") }  
                   </button>
                 </div>
               </Link>

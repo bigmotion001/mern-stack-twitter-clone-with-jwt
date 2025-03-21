@@ -13,7 +13,7 @@ import API_URL from "../../config/data";
 const Sidebar = () => {
  
   const queryClient = useQueryClient();
-  const { mutate } = useMutation({
+  const { mutate:logout } = useMutation({
     mutationFn: async () => {
       try {
         const res = await fetch(`${API_URL}/api/auth/logout`, {
@@ -96,7 +96,7 @@ const {data:authUser} = useQuery({queryKey: ["authUser"]});
                 className="w-5 h-5 cursor-pointer"
                 onClick={(e) => {
                   e.preventDefault();
-                  mutate();
+                  logout();
                 }}
               />
             </div>

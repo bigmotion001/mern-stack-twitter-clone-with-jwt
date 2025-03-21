@@ -6,7 +6,7 @@ export const getAllNotification = async (req, res) => {
     try {
         //get user id
         const userId = req.userId;
-        console.log(userId);
+        
         //check if user exist
         const user = await User.findById(userId);
         if (!user) return res.status(404).json({ message: "User not found" });
@@ -16,7 +16,7 @@ export const getAllNotification = async (req, res) => {
             select: "username profileImg"
         })
         //update notification
-        await notifications.updateMany({ to: userId }, { read: true });
+        await Notification.updateMany({ to: userId }, { read: true });
         res.status(200).json(notifications);
 
     } catch (error) {

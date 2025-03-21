@@ -11,6 +11,7 @@ import { Toaster } from "react-hot-toast";
 import { useQuery } from "@tanstack/react-query";
 import API_URL from "./config/data";
 import LoadingSpinner from "./components/common/LoadingSpinner";
+import NotificationPage from "./pages/notification/NotificationPage";
 
 function App() {
   const { data: authUser, isLoading } = useQuery({
@@ -52,8 +53,8 @@ function App() {
           element={authUser ? <HomePage /> : <Navigate to="/login" />}
         />
         <Route
-          path="/notification"
-          element={authUser ? <Notification /> : <Navigate to="/login" />}
+          path="/notifications"
+          element={authUser ? <NotificationPage /> : <Navigate to="/login" />}
         />
         <Route
           path="/profile/:username"
