@@ -6,18 +6,40 @@ import LoginPage from "./pages/auth/login/LoginPage";
 import Sidebar from "./components/common/Sidebar";
 import ProfilePage from "./pages/profile/ProfilePage";
 import RightPanel from "./components/common/RightPanel";
-import Notification from "./pages/notification/NotificationPage";
+import UserFollowing from "./following/UserFollowing";
 import { Toaster } from "react-hot-toast";
 import { useQuery } from "@tanstack/react-query";
 import API_URL from "./config/data";
 import LoadingSpinner from "./components/common/LoadingSpinner";
 import NotificationPage from "./pages/notification/NotificationPage";
+import Chat from "./message/Chat";
+
+
+
+
+
 
 function App() {
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+
   const { data: authUser, isLoading } = useQuery({
     queryKey: ["authUser"],
     queryFn: async () => {
       try {
+        
         const res = await fetch(`${API_URL}/api/auth/get-user`, {
           method: "GET",
           credentials: "include",
@@ -26,6 +48,7 @@ function App() {
         const data = await res.json();
         if (data.error) return null;
         if (!res.ok) {
+          
           throw new Error(data.message);
         }
         return data;
@@ -33,8 +56,16 @@ function App() {
         throw new Error(error);
       }
     },
+   
     retry: false,
   });
+
+
+
+
+
+
+
 
   if (isLoading) {
     return (
@@ -56,6 +87,16 @@ function App() {
           path="/notifications"
           element={authUser ? <NotificationPage /> : <Navigate to="/login" />}
         />
+        <Route
+          path="/followings"
+          element={authUser ? <UserFollowing /> : <Navigate to="/login" />}
+        />
+
+        <Route
+          path="/chat/:username"
+          element={authUser ? <Chat /> : <Navigate to="/login" />}
+        />
+
         <Route
           path="/profile/:username"
           element={authUser ? <ProfilePage /> : <Navigate to="/login" />}

@@ -40,3 +40,16 @@ export const formatMemberSinceDate = (createdAt) => {
 	const year = date.getFullYear();
 	return `Joined ${month} ${year}`;
 };
+
+
+
+	export function formatMessageTime(date) {
+		return new Date(date).toLocaleTimeString("en-US", {
+		  hour: "2-digit",
+		  minute: "2-digit",
+		  hour12: true,
+		  
+		//   month: "long",
+		//   day: "2-digit"
+		});
+	  }

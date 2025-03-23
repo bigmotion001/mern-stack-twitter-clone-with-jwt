@@ -17,51 +17,18 @@ import API_URL from "../../config/data";
 import LoadingSpinner from "../../components/common/LoadingSpinner";
 import useFollow from "../../hooks/useFollow";
 
+import { useUserProfile } from "../../hooks/useUserProfile";
+
 
 const ProfilePage = () => {
 	const {username} = useParams();
-
-	const {followUser, isPending:isFollowing} = useFollow();
-	const { data: authUser } = useQuery({ queryKey: ["authUser"] });
+	const { data: user, isLoading, isRefetching, refetch } = useUserProfile(username);
 
 
 
 
-
-	//get user
-	const {data:user, isLoading, refetch, isRefetching} = useQuery({
-		queryKey:["userprofile"],
-		queryFn: async ()=>{
-			try {
-				const res= await fetch(`${API_URL}/api/users/profile/${username}`, {
-					method: "GET",
-					credentials: 'include',
-					
-				});
-				const data = await res.json();
-				if(!res.ok){
-					
-					throw new Error(data.message)
-					
-				}
-				
-				return data;
-			} catch (error) {
-				throw new Error(error.message);
-			};
-		},
-	
-		 
-			
-		
-		
-		
-	})
-
-
-
-
-
+const {followUser, isPending:isFollowing} = useFollow();
+const { data: authUser } = useQuery({ queryKey: ["authUser"] });
 
 
 
@@ -154,6 +121,11 @@ const amIFollowing = authUser?.following.includes(user?._id);
 									className='h-52 w-full object-cover'
 									alt='cover image'
 								/>
+
+
+
+
+								
 								{isMyProfile && (
 									<div
 										className='absolute top-2 right-2 rounded-full p-2 bg-gray-800 bg-opacity-75 cursor-pointer opacity-0 group-hover/cover:opacity-100 transition duration-200'
@@ -190,8 +162,19 @@ const amIFollowing = authUser?.following.includes(user?._id);
 									</div>
 								</div>
 							</div>
-							<div className='flex justify-end px-4 mt-5'>
+							<div className='flex justify-end px-4  mt-5'>
 								{isMyProfile && <EditProfileModal />}
+
+								{!isFollowing && amIFollowing && (
+									<Link
+									className='btn btn-outline rounded-full btn-sm mr-6 text-green-500'
+									to={`/chat/${user.username}`}
+								>
+									Message
+								</Link>
+								)}
+
+
 								{!isMyProfile && (
 									<button
 										className='btn btn-outline rounded-full btn-sm'
@@ -252,15 +235,19 @@ const amIFollowing = authUser?.following.includes(user?._id);
 									</div>
 								</div>
 								<div className='flex gap-2'>
+
+								<Link to={"/followings"}>
 									<div className='flex gap-1 items-center'>
 										<span className='font-bold text-xs'>{user?.following.length}</span>
 										<span className='text-slate-500 text-xs'>Following</span>
 									</div>
+									</Link>
 									<div className='flex gap-1 items-center'>
 										<span className='font-bold text-xs'>{user?.followers.length}</span>
 										<span className='text-slate-500 text-xs'>Followers</span>
 									</div>
 								</div>
+								
 							</div>
 							<div className='flex w-full border-b border-gray-700 mt-4'>
 								<div
@@ -285,7 +272,7 @@ const amIFollowing = authUser?.following.includes(user?._id);
 						</>
 					)}
 
-					<POSTS />
+					<POSTS feedType={feedType} username={username} userId={user?._id}  />
 				</div>
 			</div>
 		</>

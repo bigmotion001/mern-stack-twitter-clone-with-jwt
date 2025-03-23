@@ -5,7 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import API_URL from "../../config/data"
 import { useEffect } from "react";
 
-const Posts = ({feedType}) => {
+const Posts = ({feedType,username, userId }) => {
 
 
 
@@ -13,7 +13,7 @@ const Posts = ({feedType}) => {
 		queryKey: ["posts"],
 		queryFn: async () => {
 		  try {
-			const res = await fetch(feedType === "following"? `${API_URL}/api/posts/following`:  `${API_URL}/api/posts/all`, {
+			const res = await fetch(feedType === "following"? `${API_URL}/api/posts/following`: feedType === "posts"?  `${API_URL}/api/posts/user/${username}`: feedType === "likes"?  `${API_URL}/api/posts/likes/${userId}`: `${API_URL}/api/posts/all` , {
 			  method: "GET",
 			  credentials: "include",
 			});
