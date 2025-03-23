@@ -1,5 +1,5 @@
 
-const APP_ENV = 'local'
+const APP_ENV = 'prod'
 
 let API_URL = ''
 
@@ -12,7 +12,7 @@ switch (APP_ENV) {
         break;
     case 'prod':
         console.log('connecting to prod')
-        API_URL = ''
+        API_URL = 'https://twitter-clone-fddo.onrender.com'
         break;
     default:
         console.log('connecting to default api (local)')
