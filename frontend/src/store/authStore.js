@@ -1,10 +1,9 @@
 import { create } from "zustand";
 import axios from "axios";
 import { io } from "socket.io-client";
+import API_URL from "../config/data";
 
-const API_URL =
-  import.meta.env.MODE === "development" ? "http://localhost:8000" : "/";
-axios.defaults.withCredentials = true;
+
 
 export const useAuthStore = create((set, get) => ({
   messages: [],
