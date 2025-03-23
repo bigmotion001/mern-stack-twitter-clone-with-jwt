@@ -4,14 +4,14 @@
   "main": "backend/server.js",
   "scripts": {
     "dev": "NODE_ENV=development nodemon backend/server.js",
-    "start": "NODE_ENV=production node backend/server.js",
-    "build": "npm install && npm install --prefix frontend && npm run build --prefix frontend"
+		"start": "NODE_ENV=production node backend/server.js",
+		"build": "npm install && npm install --prefix frontend && npm run build --prefix frontend"
   },
   "keywords": [],
   "type": "module",
-  "author": "",
+  "author": "Kelvin Brown",
   "license": "ISC",
-  "description": "",
+  "description": "Twitter clone social medial chat app",
   "dependencies": {
     "bcryptjs": "^3.0.2",
     "cloudinary": "^2.5.1",
